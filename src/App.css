@@ -1,0 +1,17 @@
+#root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.App {
+    width: 800px;
+}
+
+.helper-coins {
+    display: flex;
+}
+
+.helper-text {
+    margin-right: 10px;
+}
