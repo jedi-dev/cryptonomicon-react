@@ -29,6 +29,7 @@ function ChoosingCryptocurrency({create}) {
 	const addCoin = (e) => {
 		e.preventDefault()
 		create(name.toUpperCase())
+		setName('')
 	}
 	return (
 		<>

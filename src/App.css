@@ -15,3 +15,18 @@
 .helper-text {
     margin-right: 10px;
 }
+
+.list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    justify-items: start;
+    border-top: 1px solid #9e9e9e;
+    border-bottom: 1px solid #9e9e9e;
+    margin-top: 1rem;
+
+}
+
+.card {
+    margin-top: 1rem;
+}
