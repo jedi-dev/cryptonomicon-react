@@ -7,25 +7,39 @@ import MySelect from './components/UI/MySelect'
 
 function App() {
 	const [cryptocurrencies, setCryptocurrencies] = useState([])
+	const [selectedSort, setSelectedSort] = useState('')
 	const createCoinList = (name) => {
 		getCryptocurrency(name).then((data) => {
 			setCryptocurrencies([...cryptocurrencies, {coin: name, price: data.USD, key: Date.now()}])
 		})
-		
 	}
-	
 	const deleteCoin = (name) => {
 		setCryptocurrencies(cryptocurrencies.filter(e => e.coin !== name))
 	}
+	const sortCoin = (sort) => {
+		setSelectedSort(sort)
+		setCryptocurrencies([...cryptocurrencies].sort((a, b) => {
+			if (sort === 'price-min') {
+				return a['price'] - b['price']
+			}
+			if (sort === 'price-max') {
+				return b['price'] - a['price']
+			}
+			return a[sort].localeCompare(b[sort])
+		}))
+	}
+	
 	return <div className='App'>
 		<main className='container content'>
 			<ChoosingCryptocurrency create={createCoinList} />
-			<div style={{margin: '10px 0 10px 0'}}>
+			<div style={{margin: '20px 0 10px 0'}}>
 				<MySelect
+					value={selectedSort}
+					onChange={sortCoin}
 					options={[
 						{value: 'coin', name: 'По названию'},
-						{value: 'price', name: 'По возрастанию цены'},
-						{value: 'price', name: 'По убыванию цены'}
+						{value: 'price-min', name: 'По возрастанию цены'},
+						{value: 'price-max', name: 'По убыванию цены'}
 					]}
 				/>
 			</div>

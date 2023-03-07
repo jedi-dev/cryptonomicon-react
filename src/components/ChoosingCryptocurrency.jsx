@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react'
 import {getNamesOfCryptocurrencies} from '../api'
+import MyInput from './UI/MyInput'
 
 function ChoosingCryptocurrency({create}) {
 	const [name, setName] = useState('')
@@ -31,18 +32,20 @@ function ChoosingCryptocurrency({create}) {
 		create(name.toUpperCase())
 		setName('')
 	}
+	
+	const addName = (name) => {
+		setName(name)
+	}
+	
 	return (
 		<>
 			<h5>Тикер</h5>
 			<div className='input-field col s12'>
-				<input
-					id='search'
-					type='search'
-					className='validate'
-					value={name}
-					onChange={e => setName(e.target.value)}
-					placeholder={'Cryptocurrency'}
-				/>
+				<div className='row'>
+					<div className='input-field col s6'>
+						<MyInput name={name} onChange={addName} />
+					</div>
+				</div>
 				<div className='helper-coins'>
 					{filteredCoins ? filteredCoins.map((e, i) =>
 							<span className='helper-text' key={i + 1} onClick={(e) => setName(e.target.innerText)} data-error='wrong'

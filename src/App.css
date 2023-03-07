@@ -16,6 +16,10 @@
     margin-right: 10px;
 }
 
+.row {
+    margin-bottom: 0;
+}
+
 .list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
