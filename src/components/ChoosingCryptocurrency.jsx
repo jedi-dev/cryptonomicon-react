@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react'
 import {getNamesOfCryptocurrencies} from '../api'
 import MyInput from './UI/MyInput'
+import MyButton from './UI/MyButton'
 
 function ChoosingCryptocurrency({create}) {
 	const [name, setName] = useState('')
@@ -33,8 +34,12 @@ function ChoosingCryptocurrency({create}) {
 		setName('')
 	}
 	
-	const addName = (name) => {
-		setName(name)
+	
+	const handleKeyDown = () => {
+		if (name) {
+			create(name.toUpperCase())
+			setName('')
+		}
 	}
 	
 	return (
@@ -43,7 +48,11 @@ function ChoosingCryptocurrency({create}) {
 			<div className='input-field col s12'>
 				<div className='row'>
 					<div className='input-field col s6'>
-						<MyInput name={name} onChange={addName} />
+						<MyInput
+							value={name}
+							onChange={e => setName(e.target.value)}
+							onKeyDown={e => e.key === 'Enter' ? handleKeyDown() : null}
+							placeholder={'Cryptocurrency'} />
 					</div>
 				</div>
 				<div className='helper-coins'>
@@ -52,11 +61,8 @@ function ChoosingCryptocurrency({create}) {
 							      data-success='right'>{e}</span>)
 						: null}
 				</div>
-			
 			</div>
-			<a href='#section' onClick={name ? addCoin : null}
-			   className='waves-effect waves-light btn'><i
-				className='material-icons left'>add_circle_outline</i>Добавить</a>
+			<MyButton onClick={name ? addCoin : null} name={'Добавить'} icon={'add_circle_outline'} />
 		</>
 	)
 }

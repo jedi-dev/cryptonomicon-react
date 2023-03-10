@@ -1,52 +1,47 @@
 import './App.css'
 import {ChoosingCryptocurrency} from './components/ChoosingCryptocurrency'
 import {getCryptocurrency} from './api'
-import {useState} from 'react'
+import {useMemo, useState} from 'react'
 import CryptocurrencyList from './components/CryptocurrencyList'
-import MySelect from './components/UI/MySelect'
+import CoinFilter from './components/CoinFilter'
 
 function App() {
 	const [cryptocurrencies, setCryptocurrencies] = useState([])
-	const [selectedSort, setSelectedSort] = useState('')
+	const [filter, setFilter] = useState({sort: '', query: ''})
 	const createCoinList = (name) => {
 		getCryptocurrency(name).then((data) => {
 			setCryptocurrencies([...cryptocurrencies, {coin: name, price: data.USD, key: Date.now()}])
 		})
 	}
+	
+	const sortedCoins = useMemo(() => {
+		if (filter.sort) {
+			return [...cryptocurrencies].sort((a, b) => {
+				if (filter.sort === 'price-min') {
+					return a['price'] - b['price']
+				}
+				if (filter.sort === 'price-max') {
+					return b['price'] - a['price']
+				}
+				return a[filter.sort].localeCompare(b[filter.sort])
+			})
+		}
+		return cryptocurrencies
+	}, [filter.sort, cryptocurrencies])
+	
+	const sortedAndSearchedCoins = useMemo(() => {
+		return sortedCoins.filter(coin => coin.coin.includes(filter.query.toUpperCase()))
+	}, [filter.query, sortedCoins])
+	
 	const deleteCoin = (name) => {
 		setCryptocurrencies(cryptocurrencies.filter(e => e.coin !== name))
-	}
-	const sortCoin = (sort) => {
-		setSelectedSort(sort)
-		setCryptocurrencies([...cryptocurrencies].sort((a, b) => {
-			if (sort === 'price-min') {
-				return a['price'] - b['price']
-			}
-			if (sort === 'price-max') {
-				return b['price'] - a['price']
-			}
-			return a[sort].localeCompare(b[sort])
-		}))
 	}
 	
 	return <div className='App'>
 		<main className='container content'>
 			<ChoosingCryptocurrency create={createCoinList} />
-			<div style={{margin: '20px 0 10px 0'}}>
-				<MySelect
-					value={selectedSort}
-					onChange={sortCoin}
-					options={[
-						{value: 'coin', name: 'По названию'},
-						{value: 'price-min', name: 'По возрастанию цены'},
-						{value: 'price-max', name: 'По убыванию цены'}
-					]}
-				/>
-			</div>
-			{cryptocurrencies.length ?
-				<CryptocurrencyList deleteCoin={deleteCoin} cryptocurrencies={cryptocurrencies} /> :
-				<div style={{textAlign: 'center'}} className='card'><span className='card-title'>Ни одной криптовалюты не выбрано</span>
-				</div>}
+			<CoinFilter filter={filter} setFilter={setFilter} />
+			<CryptocurrencyList deleteCoin={deleteCoin} cryptocurrencies={sortedAndSearchedCoins} />
 		</main>
 	</div>
 }
