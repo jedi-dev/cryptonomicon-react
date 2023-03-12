@@ -1,5 +1,6 @@
 import React from 'react'
 import CryptocurrencyItem from './CryptocurrencyItem'
+import {CSSTransition, TransitionGroup} from 'react-transition-group'
 
 const CryptocurrencyList = ({cryptocurrencies, deleteCoin}) => {
 	if (!cryptocurrencies.length) {
@@ -8,8 +9,20 @@ const CryptocurrencyList = ({cryptocurrencies, deleteCoin}) => {
 	}
 	return (
 		<div className='list'>
-			{cryptocurrencies.map(item => <CryptocurrencyItem key={cryptocurrencies.key}
-			                                                  deleteCoin={deleteCoin} {...item} />)}
+			<TransitionGroup component={null}>
+				{cryptocurrencies.map(item =>
+					<CSSTransition
+						key={cryptocurrencies.key}
+						timeout={500}
+						classNames='coin'
+					>
+						<CryptocurrencyItem
+							deleteCoin={deleteCoin}
+							{...item} />
+					</CSSTransition>
+				)}
+			</TransitionGroup>
+		
 		</div>
 	)
 }

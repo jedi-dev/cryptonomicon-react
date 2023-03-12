@@ -34,3 +34,22 @@
 .card {
     margin-top: 1rem;
 }
+
+.coin-enter {
+    transform: translateY(-350px);
+}
+
+.coin-enter-active {
+    transform: translateY(0px);
+    transition: all 500ms ease-in;
+}
+
+.coin-exit {
+    opacity: 1;
+}
+
+.coin-exit-active {
+    transform: translateY(350px);
+    transition: all 500ms ease-in;
+}
+
