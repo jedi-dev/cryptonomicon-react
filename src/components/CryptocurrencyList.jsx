@@ -1,29 +1,32 @@
-import React from 'react'
+import React, {useState} from 'react'
 import CryptocurrencyItem from './CryptocurrencyItem'
-import {CSSTransition, TransitionGroup} from 'react-transition-group'
+import CryptocurrencyGraph from './CryptocurrencyGraph'
 
-const CryptocurrencyList = ({cryptocurrencies, deleteCoin}) => {
+const CryptocurrencyList = ({cryptocurrencies, deleteCoin, graph}) => {
+	const [active, setActive] = useState(null)
+	
 	if (!cryptocurrencies.length) {
 		return <div style={{textAlign: 'center'}} className='card'><span className='card-title'>Ни одной криптовалюты не выбрано</span>
 		</div>
 	}
+	const getElem = (item) => {
+		setActive(item)
+	}
 	return (
-		<div className='list'>
-			<TransitionGroup component={null}>
+		<>
+			<div className='list'>
 				{cryptocurrencies.map(item =>
-					<CSSTransition
-						key={cryptocurrencies.key}
-						timeout={500}
-						classNames='coin'
-					>
-						<CryptocurrencyItem
-							deleteCoin={deleteCoin}
-							{...item} />
-					</CSSTransition>
+					<CryptocurrencyItem
+						key={item.key}
+						deleteCoin={deleteCoin}
+						item={item}
+						isActive={active === item}
+						onClick={() => getElem(item)}
+						{...item} />
 				)}
-			</TransitionGroup>
-		
-		</div>
+			</div>
+			<CryptocurrencyGraph graph={graph} active={active} onClick={getElem} />
+		</>
 	)
 }
 

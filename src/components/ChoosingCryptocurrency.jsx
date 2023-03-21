@@ -3,16 +3,14 @@ import {getNamesOfCryptocurrencies} from '../api'
 import MyInput from './UI/MyInput'
 import MyButton from './UI/MyButton'
 
-function ChoosingCryptocurrency({create}) {
+function ChoosingCryptocurrency({create, selected, getSelected}) {
 	const [name, setName] = useState('')
 	const [namesOfCryptocurrencies, setNamesOfCryptocurrencies] = useState([])
 	const [filteredCoins, setFilteredCoins] = useState([])
 	
 	
 	useEffect(() => {
-		getNamesOfCryptocurrencies(name).then((data) => {
-			setNamesOfCryptocurrencies(Object.keys(data.Data))
-		})
+		fetchNamesOfCryptocurrencies()
 		return () => {
 			setNamesOfCryptocurrencies([])
 		}
@@ -22,11 +20,23 @@ function ChoosingCryptocurrency({create}) {
 			.filter(e => e.includes(name.toUpperCase()))
 			.sort((a, b) => a.length - b.length)
 			.slice(0, 4)
-		name ? setFilteredCoins(coins) : setFilteredCoins([])
+		if (name) {
+			setFilteredCoins(coins)
+			getSelected()
+		} else {
+			setFilteredCoins([])
+		}
+		
 		return () => {
 			setFilteredCoins([])
 		}
 	}, [name]) // eslint-disable-line react-hooks/exhaustive-deps
+	
+	async function fetchNamesOfCryptocurrencies() {
+		await getNamesOfCryptocurrencies(name).then(response =>
+			setNamesOfCryptocurrencies(Object.keys(response.Data)))
+		
+	}
 	
 	const addCoin = (e) => {
 		e.preventDefault()
@@ -55,6 +65,7 @@ function ChoosingCryptocurrency({create}) {
 							placeholder={'Cryptocurrency'} />
 					</div>
 				</div>
+				{selected ? <div>Такая криптовалюта уже выбрана</div> : null}
 				<div className='helper-coins'>
 					{filteredCoins ? filteredCoins.map((e, i) =>
 							<span className='helper-text' key={i + 1} onClick={(e) => setName(e.target.innerText)} data-error='wrong'

@@ -1,47 +1,78 @@
-import './App.css'
+import './styles/App.css'
 import {ChoosingCryptocurrency} from './components/ChoosingCryptocurrency'
 import {getCryptocurrency} from './api'
-import {useMemo, useState} from 'react'
+import {useEffect, useState} from 'react'
 import CryptocurrencyList from './components/CryptocurrencyList'
 import CoinFilter from './components/CoinFilter'
+import {useCoins} from './hooks/useCoins'
 
 function App() {
 	const [cryptocurrencies, setCryptocurrencies] = useState([])
 	const [filter, setFilter] = useState({sort: '', query: ''})
-	const createCoinList = (name) => {
-		getCryptocurrency(name).then((data) => {
-			setCryptocurrencies([...cryptocurrencies, {coin: name, price: data.USD, key: Date.now()}])
-		})
+	const sortedAndSearchedCoins = useCoins(cryptocurrencies, filter.sort, filter.query)
+	const [coinSelected, setCoinSelected] = useState(false)
+	const [graph, setGraph] = useState([])
+	
+	useEffect(() => {
+		return () => clearInterval(interval)
+	}, [])
+	
+	const createCoinList = (coinName) => {
+		if (!cryptocurrencies.some(e => e.coin === coinName)) {
+			setCryptocurrencies([...cryptocurrencies,
+				{
+					coin: coinName,
+					price: 0,
+					key: Date.now()
+				}])
+			if (!graph.some(e => e.coin === coinName)) {
+				setGraph([...graph,
+					{
+						coin: coinName,
+						price: []
+					}])
+			}
+			interval(coinName)
+		} else {
+			setCoinSelected(true)
+		}
 	}
 	
-	const sortedCoins = useMemo(() => {
-		if (filter.sort) {
-			return [...cryptocurrencies].sort((a, b) => {
-				if (filter.sort === 'price-min') {
-					return a['price'] - b['price']
-				}
-				if (filter.sort === 'price-max') {
-					return b['price'] - a['price']
-				}
-				return a[filter.sort].localeCompare(b[filter.sort])
+	const interval = (name) => {
+		setInterval(async () => {
+			await getCryptocurrency(name).then(price => {
+				setCryptocurrencies(prevState => prevState.map(e => {
+					if (e.coin === name) {
+						e.price = price.USD > 1 ? price.USD.toFixed(2) : price.USD.toPrecision(2)
+					}
+					return e
+				}))
+				setGraph(prevState => prevState.map(e => {
+					if (e.coin === name) {
+						e.price = [...e.price, price.USD]
+					}
+					return e
+				}))
 			})
-		}
-		return cryptocurrencies
-	}, [filter.sort, cryptocurrencies])
-	
-	const sortedAndSearchedCoins = useMemo(() => {
-		return sortedCoins.filter(coin => coin.coin.includes(filter.query.toUpperCase()))
-	}, [filter.query, sortedCoins])
-	
-	const deleteCoin = (name) => {
+		}, 5000)
+		
+	}
+	const deleteCoin = (name, e) => {
+		e.stopPropagation()
 		setCryptocurrencies(cryptocurrencies.filter(e => e.coin !== name))
+		clearInterval(interval)
+	}
+	
+	const getSelected = () => {
+		if (coinSelected)
+			setCoinSelected(false)
 	}
 	
 	return <div className='App'>
 		<main className='container content'>
-			<ChoosingCryptocurrency create={createCoinList} />
+			<ChoosingCryptocurrency create={createCoinList} selected={coinSelected} getSelected={getSelected} />
 			<CoinFilter filter={filter} setFilter={setFilter} />
-			<CryptocurrencyList deleteCoin={deleteCoin} cryptocurrencies={sortedAndSearchedCoins} />
+			<CryptocurrencyList graph={graph} deleteCoin={deleteCoin} cryptocurrencies={sortedAndSearchedCoins} />
 		</main>
 	</div>
 }
