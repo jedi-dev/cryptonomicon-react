@@ -33,9 +33,12 @@ function ChoosingCryptocurrency({create, selected, getSelected}) {
 	}, [name]) // eslint-disable-line react-hooks/exhaustive-deps
 	
 	async function fetchNamesOfCryptocurrencies() {
-		await getNamesOfCryptocurrencies(name).then(response =>
-			setNamesOfCryptocurrencies(Object.keys(response.Data)))
-		
+		try {
+			const response = await getNamesOfCryptocurrencies(name)
+			setNamesOfCryptocurrencies(Object.keys(response.Data))
+		} catch (err) {
+			console.error(err.message)
+		}
 	}
 	
 	const addCoin = (e) => {

@@ -6,7 +6,7 @@ const CryptocurrencyList = ({cryptocurrencies, deleteCoin, graph}) => {
 	const [active, setActive] = useState(null)
 	
 	if (!cryptocurrencies.length) {
-		return <div style={{textAlign: 'center'}} className='card'><span className='card-title'>Ни одной криптовалюты не выбрано</span>
+		return <div className='card'><span className='card-title'>Ни одной криптовалюты не выбрано</span>
 		</div>
 	}
 	const getElem = (item) => {

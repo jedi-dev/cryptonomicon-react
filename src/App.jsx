@@ -40,7 +40,8 @@ function App() {
 	
 	const interval = (name) => {
 		setInterval(async () => {
-			await getCryptocurrency(name).then(price => {
+			try {
+				const price = await getCryptocurrency(name)
 				setCryptocurrencies(prevState => prevState.map(e => {
 					if (e.coin === name) {
 						e.price = price.USD > 1 ? price.USD.toFixed(2) : price.USD.toPrecision(2)
@@ -53,7 +54,10 @@ function App() {
 					}
 					return e
 				}))
-			})
+			} catch (err) {
+				console.error(err.message)
+			}
+			
 		}, 5000)
 		
 	}

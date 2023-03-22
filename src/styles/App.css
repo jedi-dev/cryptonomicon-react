@@ -42,8 +42,13 @@ body {
 
 }
 
+.input-select {
+    display: block;
+}
+
 .card {
     margin-top: 1rem;
+    text-align: center;
 }
 
 .card-border {
